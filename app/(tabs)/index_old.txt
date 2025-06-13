@@ -1,0 +1,149 @@
+import MovieCard from "@/components/MovieCard";
+import SearchBar from "@/components/SearchBar";
+import TrendingCard from "@/components/TrendingCard";
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
+import { fetchMovies } from "@/services/api";
+import { getTrendingMovies } from "@/services/appwrite";
+
+import useFetch from "@/services/useFetch";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+export default function Index() {
+  const [page, setPage] = useState(1);
+  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+  const router = useRouter();
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const {
+    data: trendingMovies,
+    loading: trendingMoviesLoading,
+    error: trendingMoviesError,
+  } = useFetch(getTrendingMovies);
+
+  const {
+    data: movies,
+    loading: moviesLoading,
+    error: moviesError,
+    refetch: fetchMoviesData,
+  } = useFetch(() => fetchMovies({ query: "" }, page));
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    setPage((prev) => prev + 1);
+    await fetchMoviesData();
+    setIsLoadingMore(false);
+  };
+
+  useEffect(() => {
+    if (movies) {
+      if (page === 1) {
+        setAllMovies(movies);
+      } else {
+        setAllMovies((prev) => [...prev, ...movies]);
+      }
+    }
+  }, [movies]);
+
+  return (
+    <View className="flex-1 bg-primary">
+      <Image source={images.bg} className="absolute w-full z-0" />
+      <ScrollView
+        className="flex-1 px-5"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          minHeight: "100%",
+          paddingBottom: 10,
+        }}
+      >
+        {(moviesLoading && page === 1) || trendingMoviesLoading ? (
+          <ActivityIndicator
+            size="large"
+            color="#0000fff"
+            className="mt-10 self-center"
+          />
+        ) : moviesError || trendingMoviesError ? (
+          <Text>
+            Error: {moviesError?.message || trendingMoviesError?.message}
+          </Text>
+        ) : (
+          <View className="flex-1 mt-5">
+            <Image
+              source={icons.logo}
+              className="w-12 h-10 mt-20 mb-5 mx-auto"
+            />
+
+            <SearchBar
+              value=""
+              onPress={() => router.push("/search")}
+              placeholder="Search for a Movie"
+            />
+
+            {trendingMovies && (
+              <View className="mt-10 ml-5">
+                <Text className="text-lg text-white font-bold mb-3">
+                  Trending Movies
+                </Text>
+                <FlatList
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  ItemSeparatorComponent={() => <View className="w-7"></View>}
+                  data={trendingMovies}
+                  renderItem={({ item, index }) => (
+                    <TrendingCard movie={item} index={index} />
+                  )}
+                  keyExtractor={(item) => item.movie_id.toString()}
+                />
+              </View>
+            )}
+
+            <Text className="text-lg text-white font-bold mt-5 mb-3 px-5">
+              Latest Movies
+            </Text>
+
+            <FlatList
+              scrollEnabled={false}
+              data={allMovies}
+              renderItem={({ item }) => <MovieCard {...item} />}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={3}
+              columnWrapperStyle={{
+                justifyContent: "flex-start",
+                gap: 20,
+                paddingHorizontal: 20,
+                marginBottom: 10,
+              }}
+              contentContainerStyle={{
+                paddingBottom: 100,
+              }}
+              ListFooterComponent={
+                <TouchableOpacity
+                  className="w-full h-10 bg-white rounded-lg justify-center items-center my-5 mx-5"
+                  onPress={handleLoadMore}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? (
+                    <ActivityIndicator size="small" color="#0000ff" />
+                  ) : (
+                    <Text className="text-black font-semibold">Load More</Text>
+                  )}
+                </TouchableOpacity>
+              }
+            />
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+}
