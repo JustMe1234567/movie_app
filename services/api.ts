@@ -7,16 +7,20 @@ export const TMBD_CONFIG = {
   },
 };
 
-export const fetchMovies = async ({ query }: { query: string }) => {
+export const fetchMovies = async (
+  { query }: { query: string },
+  page: number = 1
+) => {
   const endpoint = query
     ? `${TMBD_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-    : `${TMBD_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc`;
+    : `${TMBD_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc&page=${page}&include_adult=false`;
   const res = await fetch(endpoint, {
     method: "GET",
     headers: TMBD_CONFIG.headers,
   });
 
   if (!res.ok) {
+    //@ts-ignore
     throw new Error("Failed to fetch movies", res.statusText);
   }
 
