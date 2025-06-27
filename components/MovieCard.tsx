@@ -30,7 +30,7 @@ const MovieCard = ({
           <Text className="text-xs font-bold text-white uppercase">
             {/* {Math.round(vote_average / 1)} */}
 
-            {Math.round(vote_average * 10) / 10}
+            {(Math.round(vote_average * 10) / 10).toFixed(1)}
           </Text>
         </View>
         <View className="flex-row items-center justify-between">

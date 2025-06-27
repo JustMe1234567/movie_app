@@ -116,7 +116,7 @@ export default function Index() {
             />
 
             {trendingMovies && (
-              <View className="mt-10 ml-5">
+              <View className="mt-10 ml-5 ">
                 <Text className="text-lg text-white font-bold mb-3">
                   Trending Movies
                 </Text>
@@ -129,6 +129,9 @@ export default function Index() {
                     <TrendingCard movie={item} index={index} />
                   )}
                   keyExtractor={(item) => item.movie_id.toString()}
+                  contentContainerStyle={{
+                    paddingRight: 30,
+                  }}
                 />
               </View>
             )}
@@ -139,17 +142,19 @@ export default function Index() {
           </>
         }
         ListFooterComponent={
-          <TouchableOpacity
-            className="w-full h-10 bg-white rounded-lg justify-center items-center my-5 mx-5"
-            onPress={handleLoadMore}
-            disabled={isLoadingMore}
-          >
-            {isLoadingMore ? (
-              <ActivityIndicator size="small" color="#0000ff" />
-            ) : (
-              <Text className="text-black font-semibold">Load More</Text>
-            )}
-          </TouchableOpacity>
+          <View className="flex-1 items-center mx-5 mt-5">
+            <TouchableOpacity
+              className="w-full h-10 bg-white rounded-lg justify-center items-center "
+              onPress={handleLoadMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Text className="text-black font-semibold">Load More</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         }
       />
     </View>

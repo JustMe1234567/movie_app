@@ -2,16 +2,25 @@ import { Stack } from "expo-router";
 import "./global.css";
 export default function RootLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "#161622" },
+      }}
+    >
       <Stack.Screen
         name="(tabs)"
         options={{
           headerShown: false,
+          contentStyle: { backgroundColor: "#161622" },
         }}
       />
       <Stack.Screen
-        name="movie/[id]"
-        options={{ headerShown: false }}
+        name="movies/[id]"
+        options={{
+          headerShown: false,
+          contentStyle: { backgroundColor: "#161622" },
+        }}
       ></Stack.Screen>
     </Stack>
   );

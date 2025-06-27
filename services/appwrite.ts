@@ -43,6 +43,7 @@ export const getTrendingMovies = async (): Promise<TrendingMovie[]> => {
   try {
     const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
       Query.limit(5),
+      // Query.orderDesc("createdAt"),
       Query.orderDesc("count"),
     ]);
     return result.documents as unknown as TrendingMovie[];
